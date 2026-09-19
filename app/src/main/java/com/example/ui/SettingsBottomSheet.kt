@@ -54,6 +54,8 @@ fun SettingsBottomSheet(
     onSensitivityChanged: (luminanceThreshold: Int, triggerRatio: Float) -> Unit,
     onStripConfigChanged: (width: Int, position: Float, dualStrip: Boolean, direction: Direction) -> Unit,
     onRunnerDetailsChanged: (runner: String, event: String) -> Unit,
+    onRepoSlugChanged: (String) -> Unit,
+    onCheckForUpdates: () -> Unit,
     onSimulate: (Direction) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -67,6 +69,7 @@ fun SettingsBottomSheet(
     var direction by remember { mutableStateOf(uiState.directionFilter) }
     var runnerName by remember { mutableStateOf(uiState.runnerName) }
     var eventTitle by remember { mutableStateOf(uiState.eventTitle) }
+    var repoSlug by remember { mutableStateOf(uiState.githubRepoSlug) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -370,6 +373,59 @@ fun SettingsBottomSheet(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Simulate R → L", color = Color.Black, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
+                }
+            }
+
+            // Auto Update & GitHub Releases
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF1E293B), RoundedCornerShape(12.dp))
+                    .padding(14.dp)
+            ) {
+                Text(
+                    text = "GitHub Actions Auto Update",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Installed: v${com.example.BuildConfig.VERSION_NAME} (code ${com.example.BuildConfig.VERSION_CODE})",
+                    color = Color(0xFFF59E0B),
+                    fontSize = 12.sp,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = repoSlug,
+                    onValueChange = {
+                        repoSlug = it
+                        onRepoSlugChanged(it)
+                    },
+                    label = { Text("GitHub Repo (owner/repo)") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF06B6D4),
+                        unfocusedBorderColor = Color.DarkGray,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White
+                    ),
+                    modifier = Modifier.fillMaxWidth().testTag("github_repo_slug_input")
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    onClick = {
+                        onCheckForUpdates()
+                        onDismiss()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF06B6D4)),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth().testTag("check_updates_button")
+                ) {
+                    Text(
+                        text = if (uiState.isCheckingUpdate) "Checking GitHub..." else "Check for APK Updates",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
 

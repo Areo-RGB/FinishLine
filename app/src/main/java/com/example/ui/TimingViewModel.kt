@@ -59,6 +59,11 @@ data class TimingUiState(
     val stripWidth: Int = 32,
     val runnerName: String = "Runner #1",
     val eventTitle: String = "100m Sprint",
+    // Auto Update & Versioning
+    val githubRepoSlug: String = "PaZiske/FinishLine",
+    val isCheckingUpdate: Boolean = false,
+    val updateInfo: com.example.update.UpdateInfo? = null,
+    val showUpdateDialog: Boolean = false,
     // Dialogs / Sheets
     val showPhotoFinishDialog: Boolean = false,
     val showSettingsSheet: Boolean = false,
@@ -314,6 +319,29 @@ class TimingViewModel(application: Application) : AndroidViewModel(application) 
 
     fun setShowHistory(show: Boolean) {
         _uiState.value = _uiState.value.copy(showHistorySheet = show)
+    }
+
+    fun updateRepoSlug(slug: String) {
+        _uiState.value = _uiState.value.copy(githubRepoSlug = slug.trim())
+    }
+
+    fun setShowUpdateDialog(show: Boolean) {
+        _uiState.value = _uiState.value.copy(showUpdateDialog = show)
+    }
+
+    fun checkForUpdates() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isCheckingUpdate = true)
+            val info = com.example.update.UpdateChecker.checkForUpdates(
+                currentVersionName = com.example.BuildConfig.VERSION_NAME,
+                repoSlug = _uiState.value.githubRepoSlug
+            )
+            _uiState.value = _uiState.value.copy(
+                isCheckingUpdate = false,
+                updateInfo = info,
+                showUpdateDialog = true
+            )
+        }
     }
 
     private fun triggerHapticFeedback() {

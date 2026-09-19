@@ -253,10 +253,23 @@ fun TimingScreen(
                 onRunnerDetailsChanged = { runner, event ->
                     viewModel.updateRunnerDetails(runner, event)
                 },
+                onRepoSlugChanged = { slug ->
+                    viewModel.updateRepoSlug(slug)
+                },
+                onCheckForUpdates = {
+                    viewModel.checkForUpdates()
+                },
                 onSimulate = { dir ->
                     viewModel.simulateRunner(dir)
                 },
                 onDismiss = { viewModel.setShowSettings(false) }
+            )
+        }
+
+        if (uiState.showUpdateDialog) {
+            UpdateDialog(
+                updateInfo = uiState.updateInfo,
+                onDismiss = { viewModel.setShowUpdateDialog(false) }
             )
         }
 

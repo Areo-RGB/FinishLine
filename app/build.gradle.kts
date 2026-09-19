@@ -9,6 +9,19 @@ plugins {
   alias(libs.plugins.google.services)
 }
 
+import java.util.Properties
+
+val versionPropsFile = rootProject.file("version.properties")
+val versionProps = Properties()
+if (versionPropsFile.exists()) {
+  versionPropsFile.inputStream().use { versionProps.load(it) }
+}
+
+val currentVersionCode = System.getenv("BUILD_NUMBER")?.toIntOrNull()
+  ?: System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull()
+  ?: versionProps.getProperty("VERSION_CODE", "1").toIntOrNull() ?: 1
+val currentVersionName = versionProps.getProperty("VERSION_NAME", "1.0.0")
+
 android {
   namespace = "com.example"
   compileSdk { version = release(36) { minorApiLevel = 1 } }
@@ -17,8 +30,8 @@ android {
     applicationId = "com.aistudio.finishline.qvrpt"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = currentVersionCode
+    versionName = currentVersionName
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
