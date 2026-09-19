@@ -1,0 +1,6 @@
+{
+  "name": "FinishLine",
+  "description": "High-speed camera finish line timer utilizing luminance frame differencing, ROI strip detection, and sub-millisecond timestamps",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
